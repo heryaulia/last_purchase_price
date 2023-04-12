@@ -29,10 +29,14 @@ class ProductProduct(models.Model):
     @api.depends("last_purchase_line_id")
     def _compute_last_purchase_line_id_info(self):
         for item in self:
-            if item.last_purchase_line_id and item.last_purchase_line_id.currency_id:
-                currency = item.last_purchase_line_id.currency_id.name
+            if item.last_purchase_line_id:
+                currency = item.last_purchase_line_id.order_id.currency_id
+                currency_name = currency.name if currency else ""
                 price = item.last_purchase_line_id.price_unit
-                item.last_purchase_price = f"{currency} {price:.2f}"
+                formatted_price = "{:,.2f}".format(price)
+                item.last_purchase_price = f"{currency_name} {formatted_price}"
             else:
                 item.last_purchase_price = "0.00"
+
+
 
